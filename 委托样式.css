@@ -1,0 +1,110 @@
+.限价交易区 {
+  display: grid;
+  grid-template-columns: 1.14fr 1fr 1fr;
+  gap: 9px;
+  margin-top: 10px;
+}
+
+.限价交易区 label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.限价交易区 label span,
+.交易制度提示 {
+  color: var(--次文字);
+  font-size: 12px;
+}
+
+.交易制度提示 {
+  margin: 12px 0 0;
+  line-height: 1.65;
+}
+
+.委托板块 {
+  padding: 23px;
+}
+
+.委托列表 {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.空委托 {
+  padding: 20px;
+  border: 1px dashed rgba(180, 204, 239, 0.17);
+  border-radius: 14px;
+  color: var(--次文字);
+  font-size: 13px;
+  text-align: center;
+}
+
+.委托卡 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 15px;
+  border: 1px solid rgba(180, 204, 239, 0.12);
+  border-radius: 14px;
+  background: rgba(7, 14, 25, 0.32);
+}
+
+.委托卡 h4 {
+  margin: 0 0 7px;
+  font-size: 14px;
+}
+
+.委托卡 p {
+  margin: 0;
+  color: var(--次文字);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.委托标签 {
+  display: inline-flex;
+  align-items: center;
+  min-height: 21px;
+  margin-right: 7px;
+  padding: 0 7px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.委托标签.买入 {
+  color: #351017;
+  background: #ffabb4;
+}
+
+.委托标签.卖出 {
+  color: #06281d;
+  background: #93dfbe;
+}
+
+.撤单按钮 {
+  min-height: 36px;
+  color: #d9e5f6;
+  font-size: 12px;
+}
+
+@media (max-width: 720px) {
+  .限价交易区 {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .限价交易区 label {
+    grid-column: 1 / -1;
+  }
+
+  .委托卡 {
+    grid-template-columns: 1fr;
+  }
+
+  .撤单按钮 {
+    width: 100%;
+  }
+}
