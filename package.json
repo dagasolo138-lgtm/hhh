@@ -1,0 +1,8 @@
+{
+  "name": "zhongguo-huangjin-monishichang",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "自检": "node 市场/自检.js"
+  }
+}
