@@ -2,7 +2,8 @@ import {
   创建新市场,
   推进一步,
   玩家市价交易,
-  读取账户概况,
+  玩家限价交易,
+  撤销限价委托,
   读取界面数据,
   格式化市场时间,
 } from './核心.js';
@@ -34,13 +35,21 @@ const 元素 = {
   买一价: document.querySelector('#买一价'),
   卖一价: document.querySelector('#卖一价'),
   现金: document.querySelector('#现金'),
+  可用现金: document.querySelector('#可用现金'),
+  冻结现金: document.querySelector('#冻结现金'),
   持仓: document.querySelector('#持仓'),
+  可用持仓: document.querySelector('#可用持仓'),
+  冻结持仓: document.querySelector('#冻结持仓'),
   持仓成本: document.querySelector('#持仓成本'),
   持仓市值: document.querySelector('#持仓市值'),
   总资产: document.querySelector('#总资产'),
   总盈亏: document.querySelector('#总盈亏'),
   浮动盈亏: document.querySelector('#浮动盈亏'),
   交易数量: document.querySelector('#交易数量'),
+  限价价格: document.querySelector('#限价价格'),
+  委托区域: document.querySelector('#委托区域'),
+  委托统计: document.querySelector('#委托统计'),
+  交易制度提示: document.querySelector('#交易制度提示'),
   日志区域: document.querySelector('#日志区域'),
   日志筛选: document.querySelector('#日志筛选'),
   运行按钮: document.querySelector('#运行按钮'),
@@ -153,29 +162,39 @@ function 渲染日志(模型) {
   元素.日志区域.innerHTML = 日志.map((记录) => {
     const 涨跌 = Number(记录.涨跌幅 || 0);
     const 玩家成交 = 记录.类型 === '玩家成交';
+    const 玩家委托 = 记录.类型 === '玩家委托';
     const 标题 = 玩家成交
-      ? `${记录.方向}${Number(记录.数量 || 0).toLocaleString('zh-CN')}份`
-      : `${数字(记录.上次价格)} → ${数字(记录.最新价格)}`;
-    const 类型 = 玩家成交 ? '你的成交' : '市场波动';
+      ? `${转义(记录.方向)}${Number(记录.数量 || 0).toLocaleString('zh-CN')}份`
+      : 玩家委托
+        ? `${转义(记录.动作)} · ${转义(记录.方向)}${Number(记录.数量 || 0).toLocaleString('zh-CN')}份`
+        : `${数字(记录.上次价格)} → ${数字(记录.最新价格)}`;
+    const 类型 = 玩家成交 ? '你的成交' : 玩家委托 ? '你的委托' : '市场波动';
     const 详情 = 玩家成交
       ? `<div class="日志网格">
           <span>成交价：<b>${数字(记录.成交价)}</b></span>
           <span>成交金额：<b>${数字(记录.成交金额)}</b></span>
           <span>订单冲击：<b>${数字(记录.价格冲击, 3)}%</b></span>
         </div>`
-      : `<div class="日志网格">
-          <span>理论净值：<b>${数字(记录.内在价值)}</b></span>
-          <span>瞬时波动：<b>${数字(记录.波动率, 3)}%</b></span>
-          <span>本地流动性：<b>${数字(记录.流动性, 3)}</b></span>
-          <span>成交量：<b>${Number(记录.成交量 || 0).toLocaleString('zh-CN')}</b></span>
-        </div>
-        <div class="资金行">
-          套利 ${记录.资金?.价值资金 >= 0 ? '+' : ''}${记录.资金?.价值资金 || 0}　
-          趋势 ${记录.资金?.趋势资金 >= 0 ? '+' : ''}${记录.资金?.趋势资金 || 0}　
-          散户 ${记录.资金?.噪声资金 >= 0 ? '+' : ''}${记录.资金?.噪声资金 || 0}　
-          风控 ${记录.资金?.风控资金 >= 0 ? '+' : ''}${记录.资金?.风控资金 || 0}
-        </div>
-        ${记录.事件 ? `<div class="事件行">事件：${转义(记录.事件.名称)}</div>` : ''}`;
+      : 玩家委托
+        ? `<div class="日志网格">
+            <span>委托编号：<b>${转义(记录.编号)}</b></span>
+            <span>委托价：<b>${记录.委托价 ? `￥${数字(记录.委托价, 3)}` : '—'}</b></span>
+            <span>剩余数量：<b>${Number(记录.剩余数量 || 0).toLocaleString('zh-CN')}份</b></span>
+            <span>订单状态：<b>${转义(记录.委托状态)}</b></span>
+          </div>`
+        : `<div class="日志网格">
+            <span>理论净值：<b>${数字(记录.内在价值)}</b></span>
+            <span>瞬时波动：<b>${数字(记录.波动率, 3)}%</b></span>
+            <span>本地流动性：<b>${数字(记录.流动性, 3)}</b></span>
+            <span>成交量：<b>${Number(记录.成交量 || 0).toLocaleString('zh-CN')}</b></span>
+          </div>
+          <div class="资金行">
+            套利 ${记录.资金?.价值资金 >= 0 ? '+' : ''}${记录.资金?.价值资金 || 0}　
+            趋势 ${记录.资金?.趋势资金 >= 0 ? '+' : ''}${记录.资金?.趋势资金 || 0}　
+            散户 ${记录.资金?.噪声资金 >= 0 ? '+' : ''}${记录.资金?.噪声资金 || 0}　
+            风控 ${记录.资金?.风控资金 >= 0 ? '+' : ''}${记录.资金?.风控资金 || 0}
+          </div>
+          ${记录.事件 ? `<div class="事件行">事件：${转义(记录.事件.名称)}</div>` : ''}`;
 
     return `<details class="日志卡">
       <summary>
@@ -184,11 +203,36 @@ function 渲染日志(模型) {
           <strong>${标题}</strong>
           <small>${格式化市场时间(记录.时间)}</small>
         </div>
-        <b class="${方向类名(涨跌)}">${百分数(涨跌)}</b>
+        <b class="${方向类名(涨跌)}">${玩家委托 ? '委托' : 百分数(涨跌)}</b>
       </summary>
       <p>${转义(记录.说明 || '市场状态已更新。')}</p>
       ${详情}
     </details>`;
+  }).join('');
+}
+
+function 渲染待处理委托(模型) {
+  const 待处理 = 模型.委托.待处理;
+  元素.委托统计.textContent = `待处理 ${待处理.length} 笔`;
+
+  if (!待处理.length) {
+    元素.委托区域.innerHTML = '<div class="空委托">暂无待处理限价委托。连续竞价期间提交限价单后，会在这里等待成交或撤单。</div>';
+    return;
+  }
+
+  元素.委托区域.innerHTML = 待处理.map((订单) => {
+    const 方向类 = 订单.方向 === '买入' ? '买入' : '卖出';
+    const 冻结说明 = 订单.方向 === '买入'
+      ? `冻结现金 ￥${数字(订单.冻结现金)}`
+      : `冻结份额 ${Number(订单.冻结份额 || 0).toLocaleString('zh-CN')}份`;
+    return `<article class="委托卡">
+      <div>
+        <h4><span class="委托标签 ${方向类}">${转义(订单.方向)}</span>${转义(订单.编号)}</h4>
+        <p>限价 ￥${数字(订单.价格, 3)}　委托 ${Number(订单.数量).toLocaleString('zh-CN')}份　已成交 ${Number(订单.已成交数量 || 0).toLocaleString('zh-CN')}份　剩余 ${Number(订单.剩余数量).toLocaleString('zh-CN')}份</p>
+        <p>${冻结说明}　状态：${转义(订单.状态)}　提交：${格式化市场时间(订单.委托时间)}</p>
+      </div>
+      <button class="次要按钮 撤单按钮" data-撤单编号="${转义(订单.编号)}">撤单</button>
+    </article>`;
   }).join('');
 }
 
@@ -199,7 +243,7 @@ function 渲染分析资料(模型) {
     `美元兑人民币 ${数字(摘要.汇率, 4)}；` +
     `境内黄金现货 ${数字(摘要.国内黄金现货)} 元/克；` +
     `基金净值 ${数字(摘要.基金净值)}，交易价 ${数字(摘要.交易价格)}。` +
-    `智能分析只能读取这些数据和波动日志。`;
+    `当前待处理委托 ${模型.委托.待处理.length} 笔；智能分析只能读取这些数据和波动日志。`;
 }
 
 function 渲染界面() {
@@ -227,7 +271,11 @@ function 渲染界面() {
   元素.卖一价.textContent = `￥${数字(市场.卖一价, 3)}`;
 
   元素.现金.textContent = `￥${数字(用户.现金)}`;
+  元素.可用现金.textContent = `￥${数字(账户.可用现金)}`;
+  元素.冻结现金.textContent = `￥${数字(账户.冻结现金)}`;
   元素.持仓.textContent = `${Number(用户.持仓).toLocaleString('zh-CN')} 份`;
+  元素.可用持仓.textContent = `${Number(账户.可用持仓).toLocaleString('zh-CN')} 份`;
+  元素.冻结持仓.textContent = `${Number(账户.冻结持仓).toLocaleString('zh-CN')} 份`;
   元素.持仓成本.textContent = 用户.持仓 ? `￥${数字(用户.持仓成本, 3)}` : '暂无';
   元素.持仓市值.textContent = `￥${数字(账户.持仓市值)}`;
   元素.总资产.textContent = `￥${数字(账户.总资产)}`;
@@ -236,8 +284,16 @@ function 渲染界面() {
   元素.浮动盈亏.textContent = `￥${数字(账户.浮动盈亏)}`;
   元素.浮动盈亏.className = 方向类名(账户.浮动盈亏);
 
+  if (document.activeElement !== 元素.限价价格) {
+    元素.限价价格.value = Number(市场.价格).toFixed(3);
+  }
+  元素.交易制度提示.textContent = 市场.连续竞价中
+    ? `连续竞价中。前收 ￥${数字(市场.前收盘价, 3)}，跌停 ￥${数字(市场.跌停价, 3)}，涨停 ￥${数字(市场.涨停价, 3)}。限价单当日有效。`
+    : `当前不处于连续竞价。前收 ￥${数字(市场.前收盘价, 3)}，跌停 ￥${数字(市场.跌停价, 3)}，涨停 ￥${数字(市场.涨停价, 3)}。集合竞价订单池将在后续版本实现。`;
+
   元素.运行按钮.textContent = 市场状态.系统.已运行 ? '暂停市场' : '启动市场';
   渲染构成(模型);
+  渲染待处理委托(模型);
   渲染日志(模型);
   渲染分析资料(模型);
 }
@@ -271,7 +327,7 @@ function 重启计时器() {
   启动市场();
 }
 
-function 处理交易(方向) {
+function 处理市价交易(方向) {
   const 结果 = 玩家市价交易(市场状态, 方向, 元素.交易数量.value);
   if (!结果.成功) {
     显示提示(结果.原因, '警告');
@@ -280,6 +336,33 @@ function 处理交易(方向) {
   渲染界面();
   排队保存();
   显示提示(结果.日志?.说明 || '成交已写入市场日志。', '成交');
+}
+
+function 处理限价交易(方向) {
+  const 结果 = 玩家限价交易(市场状态, 方向, 元素.交易数量.value, 元素.限价价格.value);
+  if (!结果.成功) {
+    显示提示(结果.原因, '警告');
+    return;
+  }
+
+  渲染界面();
+  排队保存();
+  const 订单 = 结果.订单;
+  const 描述 = 订单.状态 === '全部成交'
+    ? `${订单.编号}已全部成交。`
+    : `${订单.编号}已进入队列，剩余 ${Number(订单.剩余数量).toLocaleString('zh-CN')}份。`;
+  显示提示(描述, '成交');
+}
+
+function 处理撤单(编号) {
+  const 结果 = 撤销限价委托(市场状态, 编号);
+  if (!结果.成功) {
+    显示提示(结果.原因, '警告');
+    return;
+  }
+  渲染界面();
+  排队保存();
+  显示提示(`${结果.订单.编号}已撤销，冻结资产已释放。`, '普通');
 }
 
 async function 复制分析资料() {
@@ -340,8 +423,14 @@ function 绑定事件() {
     }
   });
   document.querySelector('#推进按钮').addEventListener('click', 演算一次);
-  document.querySelector('#买入按钮').addEventListener('click', () => 处理交易('买入'));
-  document.querySelector('#卖出按钮').addEventListener('click', () => 处理交易('卖出'));
+  document.querySelector('#买入按钮').addEventListener('click', () => 处理市价交易('买入'));
+  document.querySelector('#卖出按钮').addEventListener('click', () => 处理市价交易('卖出'));
+  document.querySelector('#限价买入按钮').addEventListener('click', () => 处理限价交易('买入'));
+  document.querySelector('#限价卖出按钮').addEventListener('click', () => 处理限价交易('卖出'));
+  元素.委托区域.addEventListener('click', (事件) => {
+    const 按钮 = 事件.target.closest('[data-撤单编号]');
+    if (按钮) 处理撤单(按钮.dataset.撤单编号);
+  });
   document.querySelector('#重置按钮').addEventListener('click', 重置市场);
   document.querySelector('#导出按钮').addEventListener('click', () => 导出市场存档(市场状态));
   document.querySelector('#复制分析按钮').addEventListener('click', 复制分析资料);
