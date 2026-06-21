@@ -1,0 +1,19 @@
+name: 市场自检
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  运行市场自检:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 获取代码
+        uses: actions/checkout@v4
+      - name: 配置运行环境
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: 执行确定性与一致性自检
+        run: npm run 自检
