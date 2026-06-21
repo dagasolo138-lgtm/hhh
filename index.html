@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0e1624">
+  <title>华辰工业模拟市场</title>
+  <link rel="stylesheet" href="./样式.css">
+</head>
+<body>
+  <div class="背景光晕 背景光晕一"></div>
+  <div class="背景光晕 背景光晕二"></div>
+
+  <header class="顶栏">
+    <div>
+      <p class="眉题">单标的微观市场实验</p>
+      <h1>华辰工业<span>模拟市场</span></h1>
+    </div>
+    <div class="顶栏右侧">
+      <div class="保存状态" id="保存提示">正在读取本地存档。</div>
+      <button class="次要按钮" id="导出按钮">导出存档</button>
+      <label class="次要按钮 导入标签">
+        导入存档
+        <input id="存档导入" type="file" accept=".json,application/json">
+      </label>
+    </div>
+  </header>
+
+  <main class="页面">
+    <section class="行情主卡">
+      <div class="行情标题">
+        <div>
+          <div class="股票行">
+            <h2 id="股票名称">华辰工业</h2>
+            <span class="状态标签" id="市场状态">平稳</span>
+          </div>
+          <p>虚拟时间：<time id="市场时间">正在载入</time></p>
+        </div>
+        <div class="市场按钮组">
+          <select id="间隔选择" aria-label="市场推进速度">
+            <option value="1600">缓慢推进</option>
+            <option value="1000" selected>正常推进</option>
+            <option value="450">快速推进</option>
+          </select>
+          <button class="主要按钮" id="运行按钮">启动市场</button>
+          <button class="次要按钮" id="推进按钮">推进一刻</button>
+        </div>
+      </div>
+
+      <div class="价格区域">
+        <div>
+          <p class="字段名">最新价格</p>
+          <strong class="大价格" id="当前价格">￥100.00</strong>
+        </div>
+        <p class="涨跌说明 平盘" id="当前涨跌">+0.000%　等待首次演算。</p>
+      </div>
+
+      <div class="指标格">
+        <div><span>内在价值</span><b id="内在价值">￥100.00</b></div>
+        <div><span>瞬时波动</span><b id="瞬时波动">0.250%</b></div>
+        <div><span>市场流动性</span><b id="流动性">1.000</b></div>
+        <div><span>买卖价差</span><b id="买卖价差">0.120%</b></div>
+      </div>
+    </section>
+
+    <section class="两列">
+      <article class="卡片">
+        <div class="卡片标题">
+          <div>
+            <p class="眉题">订单簿快照</p>
+            <h3>当前买卖盘</h3>
+          </div>
+          <span class="说明标签">自动做市</span>
+        </div>
+        <div class="盘口">
+          <div class="买盘">
+            <span>买一价</span>
+            <strong id="买一价">￥99.94</strong>
+          </div>
+          <div class="卖盘">
+            <span>卖一价</span>
+            <strong id="卖一价">￥100.06</strong>
+          </div>
+        </div>
+        <p class="卡片注释">价格并非直接被随机数改写。净买卖盘会通过流动性与价差转成价格冲击。</p>
+      </article>
+
+      <article class="卡片">
+        <div class="卡片标题">
+          <div>
+            <p class="眉题">你的账户</p>
+            <h3>持仓与资金</h3>
+          </div>
+          <button class="文字按钮" id="重置按钮">重置市场</button>
+        </div>
+        <div class="账户格">
+          <div><span>可用现金</span><b id="现金">￥100,000.00</b></div>
+          <div><span>当前持仓</span><b id="持仓">0 股</b></div>
+          <div><span>持仓成本</span><b id="持仓成本">暂无</b></div>
+          <div><span>持仓市值</span><b id="持仓市值">￥0.00</b></div>
+          <div><span>总资产</span><b id="总资产">￥100,000.00</b></div>
+          <div><span>总盈亏</span><b class="平盘" id="总盈亏">￥0.00</b></div>
+          <div><span>浮动盈亏</span><b class="平盘" id="浮动盈亏">￥0.00</b></div>
+        </div>
+        <div class="交易区">
+          <label>
+            <span>交易数量</span>
+            <input id="交易数量" type="number" min="1" step="100" value="100" inputmode="numeric">
+          </label>
+          <button class="买入按钮" id="买入按钮">市价买入</button>
+          <button class="卖出按钮" id="卖出按钮">市价卖出</button>
+        </div>
+      </article>
+    </section>
+
+    <section class="两列">
+      <article class="卡片">
+        <div class="卡片标题">
+          <div>
+            <p class="眉题">本刻定价拆解</p>
+            <h3>价格变化来自哪里</h3>
+          </div>
+          <span class="说明标签">可复盘</span>
+        </div>
+        <div class="构成列表" id="价格构成"></div>
+        <p class="卡片注释">每一项都会写入日志。后续接入智能分析时，它读取这些事实，不直接改价。</p>
+      </article>
+
+      <article class="卡片">
+        <div class="卡片标题">
+          <div>
+            <p class="眉题">智能分析扩展</p>
+            <h3>深度求索分析接口</h3>
+          </div>
+          <span class="说明标签">预留</span>
+        </div>
+        <p class="分析资料" id="分析资料">正在整理市场摘要。</p>
+        <button class="次要按钮 宽按钮" id="复制分析按钮">复制分析资料</button>
+        <p class="卡片注释">后续接入时，分析员只能读取市场摘要和波动日志；市场内核保持独立。</p>
+      </article>
+    </section>
+
+    <section class="日志板块">
+      <div class="日志标题">
+        <div>
+          <p class="眉题">不可省略的市场记忆</p>
+          <h2>波动日志</h2>
+        </div>
+        <label class="筛选器">
+          <span>筛选</span>
+          <select id="日志筛选">
+            <option value="全部">全部记录</option>
+            <option value="市场波动">市场波动</option>
+            <option value="玩家成交">你的成交</option>
+          </select>
+        </label>
+      </div>
+      <div id="日志区域" class="日志区域"></div>
+    </section>
+  </main>
+
+  <div class="提示条" id="提示条" role="status"></div>
+  <script type="module" src="./界面.js"></script>
+</body>
+</html>
