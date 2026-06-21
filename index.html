@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#0e1624">
   <title>中国黄金模拟市场</title>
   <link rel="stylesheet" href="./样式.css">
+  <link rel="stylesheet" href="./委托样式.css">
 </head>
 <body>
   <div class="背景光晕 背景光晕一"></div>
@@ -94,8 +95,12 @@
           <button class="文字按钮" id="重置按钮">重置市场</button>
         </div>
         <div class="账户格">
-          <div><span>可用现金</span><b id="现金">￥100,000.00</b></div>
+          <div><span>账户现金</span><b id="现金">￥100,000.00</b></div>
+          <div><span>可用现金</span><b id="可用现金">￥100,000.00</b></div>
+          <div><span>冻结现金</span><b id="冻结现金">￥0.00</b></div>
           <div><span>当前持仓</span><b id="持仓">0 份</b></div>
+          <div><span>可用持仓</span><b id="可用持仓">0 份</b></div>
+          <div><span>冻结持仓</span><b id="冻结持仓">0 份</b></div>
           <div><span>持仓成本</span><b id="持仓成本">暂无</b></div>
           <div><span>持仓市值</span><b id="持仓市值">￥0.00</b></div>
           <div><span>总资产</span><b id="总资产">￥100,000.00</b></div>
@@ -105,12 +110,33 @@
         <div class="交易区">
           <label>
             <span>交易数量</span>
-            <input id="交易数量" type="number" min="100" step="100" value="100" inputmode="numeric">
+            <input id="交易数量" type="number" min="1" step="100" value="100" inputmode="numeric">
           </label>
           <button class="买入按钮" id="买入按钮">市价买入</button>
           <button class="卖出按钮" id="卖出按钮">市价卖出</button>
         </div>
+        <div class="限价交易区">
+          <label>
+            <span>限价</span>
+            <input id="限价价格" type="number" min="0.001" step="0.001" value="7.000" inputmode="decimal">
+          </label>
+          <button class="买入按钮" id="限价买入按钮">限价买入</button>
+          <button class="卖出按钮" id="限价卖出按钮">限价卖出</button>
+        </div>
+        <p class="交易制度提示" id="交易制度提示">正在读取当日交易边界。</p>
       </article>
+    </section>
+
+    <section class="卡片 委托板块">
+      <div class="卡片标题">
+        <div>
+          <p class="眉题">连续竞价委托</p>
+          <h3>待处理限价单</h3>
+        </div>
+        <span class="说明标签" id="委托统计">待处理 0 笔</span>
+      </div>
+      <p class="卡片注释">限价单按价格优先、同价时间优先撮合；买单冻结现金，卖单冻结份额；未成交委托当日有效。</p>
+      <div class="委托列表" id="委托区域"></div>
     </section>
 
     <section class="两列">
@@ -152,6 +178,7 @@
             <option value="全部">全部记录</option>
             <option value="市场波动">市场波动</option>
             <option value="玩家成交">你的成交</option>
+            <option value="玩家委托">你的委托</option>
           </select>
         </label>
       </div>
