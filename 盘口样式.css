@@ -1,0 +1,167 @@
+.可见盘口区域 {
+  margin-top: 16px;
+  border-top: 1px solid rgba(180, 204, 239, 0.1);
+  padding-top: 15px;
+}
+
+.十档图例 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 10px;
+  color: var(--次文字);
+  font-size: 11px;
+}
+
+.十档图例 span {
+  border: 1px solid rgba(180, 204, 239, 0.14);
+  border-radius: 999px;
+  padding: 3px 8px;
+}
+
+.十档盘口 {
+  display: grid;
+  gap: 4px;
+}
+
+.十档表头,
+.十档行 {
+  display: grid;
+  grid-template-columns: 38px 78px 1fr minmax(54px, 1.25fr) minmax(104px, 1.55fr);
+  gap: 7px;
+  align-items: center;
+}
+
+.十档表头 {
+  color: var(--次文字);
+  font-size: 10px;
+  padding: 0 4px 4px;
+}
+
+.十档行 {
+  min-height: 26px;
+  padding: 2px 4px;
+  border-radius: 7px;
+  font-size: 11px;
+}
+
+.十档行:hover {
+  background: rgba(180, 204, 239, 0.055);
+}
+
+.十档标签 {
+  color: var(--次文字);
+}
+
+.十档价格,
+.十档数量 {
+  font-variant-numeric: tabular-nums;
+}
+
+.卖方行 .十档价格 {
+  color: #ff9ba6;
+}
+
+.买方行 .十档价格 {
+  color: #91dcb8;
+}
+
+.十档条 {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: rgba(180, 204, 239, 0.09);
+}
+
+.十档条 i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: currentColor;
+  opacity: 0.52;
+}
+
+.卖方行 {
+  color: #ff9ba6;
+}
+
+.买方行 {
+  color: #91dcb8;
+}
+
+.十档行 small {
+  color: var(--次文字);
+  font-size: 10px;
+  line-height: 1.25;
+}
+
+.十档中轴 {
+  margin: 4px 0;
+  padding: 7px 8px;
+  border-top: 1px solid rgba(180, 204, 239, 0.12);
+  border-bottom: 1px solid rgba(180, 204, 239, 0.12);
+  color: #d9e6fa;
+  font-size: 11px;
+  text-align: center;
+}
+
+.十档说明,
+.空十档 {
+  margin: 9px 0 0;
+  color: var(--次文字);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.自动委托摘要 {
+  display: grid;
+  gap: 7px;
+  margin-top: 13px;
+}
+
+.自动委托卡 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  padding: 8px 9px;
+  border: 1px solid rgba(180, 204, 239, 0.1);
+  border-radius: 9px;
+  background: rgba(7, 14, 25, 0.23);
+  color: var(--次文字);
+  font-size: 10px;
+}
+
+.自动委托卡 b {
+  color: #d9e6fa;
+  font-size: 11px;
+}
+
+.自动委托卡 small {
+  margin-left: auto;
+  border-radius: 99px;
+  padding: 2px 6px;
+  background: rgba(180, 204, 239, 0.1);
+  color: #dce8f7;
+}
+
+.自动委托卡.自动买入 {
+  border-left: 2px solid #91dcb8;
+}
+
+.自动委托卡.自动卖出 {
+  border-left: 2px solid #ff9ba6;
+}
+
+@media (max-width: 520px) {
+  .十档表头,
+  .十档行 {
+    grid-template-columns: 32px 66px 1fr minmax(42px, 1fr);
+    gap: 4px;
+  }
+
+  .十档表头 span:last-child,
+  .十档行 small {
+    display: none;
+  }
+}
