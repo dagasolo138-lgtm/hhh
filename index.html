@@ -7,6 +7,7 @@
   <title>中国黄金模拟市场</title>
   <link rel="stylesheet" href="./样式.css">
   <link rel="stylesheet" href="./委托样式.css">
+  <link rel="stylesheet" href="./盘口样式.css">
 </head>
 <body>
   <div class="背景光晕 背景光晕一"></div>
@@ -71,7 +72,7 @@
             <p class="眉题">订单簿快照</p>
             <h3>当前买卖盘</h3>
           </div>
-          <span class="说明标签">自动做市</span>
+          <span class="说明标签">统一委托流</span>
         </div>
         <div class="盘口">
           <div class="买盘">
@@ -83,7 +84,12 @@
             <strong id="卖一价">￥7.01</strong>
           </div>
         </div>
-        <p class="卡片注释">交易价由国际黄金、人民币汇率、国内溢价和盘口撮合共同形成。</p>
+        <div class="可见盘口区域">
+          <p class="十档图例"><span>做市深度</span><span>自动订单残余</span><span>你的挂单</span></p>
+          <div class="十档盘口" id="十档盘口"><div class="空十档">正在读取十档盘口。</div></div>
+          <div class="自动委托摘要" id="自动委托流">自动委托流尚未生成。</div>
+        </div>
+        <p class="卡片注释">交易价由国际黄金、人民币汇率、国内溢价和盘口撮合共同形成。十档盘口展示做市、自动订单残余和你的挂单。</p>
       </article>
 
       <article class="卡片">
@@ -188,5 +194,6 @@
 
   <div class="提示条" id="提示条" role="status"></div>
   <script type="module" src="./界面.js"></script>
+  <script type="module" src="./盘口展示.js"></script>
 </body>
 </html>
