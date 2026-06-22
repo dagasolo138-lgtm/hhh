@@ -3,6 +3,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "自检": "node 市场/自检.js && node 市场/统一委托流自检.js && node 市场/中心订单簿自检.js && node 市场/玩家中心订单自检.js && node 市场/自动开盘竞价自检.js"
+    "自检": "node 市场/自检.js && node 市场/统一委托流自检.js && node 市场/中心订单簿自检.js && node 市场/玩家中心订单自检.js && node 市场/自动开盘竞价自检.js && node 市场/运行入口自检.js"
   }
 }
